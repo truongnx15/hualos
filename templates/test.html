@@ -4,70 +4,36 @@
   <script type="text/javascript" src="../static/js/jquery.min.js"></script>
   <script type="text/javascript" src="../static/js/d3.min.js"></script>
   <script type="text/javascript" src="../static/js/c3.min.js"></script>
+  <script type="text/javascript" src="../static/js/hualos.js"></script>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Keras - Total Visualization Project</h1>
-    <hr>
-    <h2>Accurancy</h2>
-    <div id="accChart"></div>
-    <h2>Loss</h2>
-    <div id="lossChart"></div>
-    <h2>Other</h2>
-    <div id="otherChart"></div>
+  <div class="container-fluid">
+    <div class="container">
+      <div class="row">
+        <h1>Keras - Total Visualization Project</h1>
+        <hr>
+      </div>
+      <div class="row">
+        <div class="col-md-12 col-lg-6">
+          <h2>Loss</h2>
+          <div id="lossChart"></div>
+        </div>
+        <div class="col-md-12 col-lg-6">
+            <h2>Accurancy</h2>
+            <div id="accChart"></div>
+        </div>
+        <div class="col-md-12 col-lg-6">
+            <h2>Other</h2>
+            <div id="otherChart"></div>
+          </div>
+      </div>
+    </div>
   </div>
 
 </body>
 
 <script type="text/javascript">
-  var C3Chart = function(divId,fields){
-    var these = this;
-    these.divId = divId;
-    these.fields = fields;
-    these.chart = null;
-    var monitored = {};
-
-    these.init = function(){
-      console.log("init " + these.divId);
-      these.chart = c3.generate({
-        bindto:'#' + these.divId,
-        data: {
-          x: 'epoch',
-          columns: []
-        }
-      });
-    };
-    these.update = function(newData){
-      fillToMonitored(newData);
-      updateChart();
-    };
-    var fillToMonitored = function(newData){
-      for (key in newData) {
-        if (key in monitored) {
-          monitored[key].push(newData[key]);
-        } else {
-          monitored[key] = [key, newData[key]];
-        }
-      }
-    };
-    var updateChart = function(){
-      chartColumns = []
-      chartColumns.push(monitored["epoch"]);
-      for(key in monitored){
-        for(var i in these.fields){
-          field = these.fields[i];
-          if(key==field){
-            chartColumns.push(monitored[key]);
-          }
-        }
-      }
-      these.chart.load({
-        columns:chartColumns
-      });
-    };
-  };
-
   accChart = new C3Chart("accChart",["acc", "val_acc"]);
   lossChart = new C3Chart("lossChart",["loss", "val_loss"]);
   otherChart = new C3Chart("otherChart",["batch", "size"]);
@@ -107,7 +73,7 @@
 
     var source = new EventSource('/subscribe/epoch/end/');
 
-    addTestData();
+    //addTestData();
     source.addEventListener('message', function(e) {
       console.log(e.data);
       var data = JSON.parse(e.data);
