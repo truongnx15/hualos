@@ -12,6 +12,30 @@ subscriptions = []
 def health():
     return '200 OK'
 
+@app.route('/cnc/', methods=['GET'])
+def cnc():
+    return jsonify(quit=app.should_quit, pause=app.should_pause)
+
+@app.route('/cnc-quit/', methods=['GET'])
+def cnc_quit():
+    app.should_quit = True
+    return '200 OK'
+
+@app.route('/cnc-pause/', methods=['GET'])
+def cnc_pause():
+    app.should_pause = True
+    return '200 OK'
+
+@app.route('/cnc-noquit/', methods=['GET'])
+def cnc_noquit():
+    app.should_quit = False
+    return '200 OK'
+
+@app.route('/cnc-nopause/', methods=['GET'])
+def cnc_nopause():
+    app.should_pause = False
+    return '200 OK'
+
 @app.route('/', methods=['GET'])
 def home():
     return render_template('test.html')
@@ -69,5 +93,7 @@ def subscribe():
 
 if __name__ == "__main__":
     app.debug = True
+    app.should_quit = False
+    app.should_pause = False
     server = WSGIServer(("", 9000), app)
     server.serve_forever()
