@@ -32,7 +32,7 @@ class ServerSentEvent(object):
         if not self.data:
             return ""
         lines = ["%s: %s" % (v, k) 
-                 for k, v in self.desc_map.iteritems() if k]
+                 for k, v in self.desc_map.items() if k]
         
         return "%s\n\n" % "\n".join(lines)
 
