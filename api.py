@@ -31,6 +31,12 @@ def cnc_noquit():
     app.should_quit = False
     return '200 OK'
 
+@app.route('/cnc-start/', methods=['GET'])
+def cnc_start():
+    cnc_noquit()
+    cnc_nopause()
+    return '200 OK'
+
 @app.route('/cnc-nopause/', methods=['GET'])
 def cnc_nopause():
     app.should_pause = False
