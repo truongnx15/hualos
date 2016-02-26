@@ -20,13 +20,17 @@
           <div id="lossChart"></div>
         </div>
         <div class="col-md-12 col-lg-6">
-            <h2>Accurancy</h2>
+            <h2>Accuracy</h2>
             <div id="accChart"></div>
         </div>
         <div class="col-md-12 col-lg-6">
             <h2>Other</h2>
             <div id="otherChart"></div>
           </div>
+        <div class="col-md-12 col-lg-6">
+            <h2>F-Score</h2>
+            <div id="fscore"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -37,11 +41,13 @@
   accChart = new C3Chart("accChart",["acc", "val_acc"]);
   lossChart = new C3Chart("lossChart",["loss", "val_loss"]);
   otherChart = new C3Chart("otherChart",["batch", "size"]);
+  fscore = new C3Chart("fscore",["fscore0", "fscore1"]);
 
   var update = function(newData){
     accChart.update(newData);
     lossChart.update(newData);
     otherChart.update(newData);
+    fscore.update(newData);
   };
   var addTestData = function() {
     mydata1 = {
@@ -70,6 +76,7 @@
     accChart.init();
     lossChart.init();
     otherChart.init();
+    fscore.init();
 
     var source = new EventSource('/subscribe/epoch/end/');
 
