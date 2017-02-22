@@ -1,15 +1,46 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 import json, time
 from flask import Flask, Response, jsonify, render_template, request
 import gevent
 from gevent.wsgi import WSGIServer
 from gevent.queue import Queue
+import urllib
 
 app = Flask(__name__)
 subscriptions = []
 
 @app.route('/health/', methods=['GET'])
 def health():
+    return '200 OK'
+
+@app.route('/cnc/', methods=['GET'])
+def cnc():
+    return jsonify(quit=app.should_quit, pause=app.should_pause)
+
+@app.route('/cnc-quit/', methods=['GET'])
+def cnc_quit():
+    app.should_quit = True
+    return '200 OK'
+
+@app.route('/cnc-pause/', methods=['GET'])
+def cnc_pause():
+    app.should_pause = True
+    return '200 OK'
+
+@app.route('/cnc-noquit/', methods=['GET'])
+def cnc_noquit():
+    app.should_quit = False
+    return '200 OK'
+
+@app.route('/cnc-start/', methods=['GET'])
+def cnc_start():
+    cnc_noquit()
+    cnc_nopause()
+    return '200 OK'
+
+@app.route('/cnc-nopause/', methods=['GET'])
+def cnc_nopause():
+    app.should_pause = False
     return '200 OK'
 
 @app.route('/', methods=['GET'])
@@ -32,15 +63,19 @@ class ServerSentEvent(object):
         if not self.data:
             return ""
         lines = ["%s: %s" % (v, k) 
-                 for k, v in self.desc_map.iteritems() if k]
+                 for k, v in self.desc_map.items() if k]
         
         return "%s\n\n" % "\n".join(lines)
 
+
 @app.route("/publish/epoch/end/", methods=['POST'])
 def publish():
-    payload = request.form.get('data')
+
+    json_string = urllib.parse.unquote(request.get_data().decode("utf-8")).replace("+", "").replace("}'", "}").replace("data=", "")
+    payload = json.loads(json_string)
+
     try:
-        data = json.loads(payload)
+        payload = json.loads(json_string)
     except:
         return {'error':'invalid payload'}
 
@@ -69,5 +104,7 @@ def subscribe():
 
 if __name__ == "__main__":
     app.debug = True
+    app.should_quit = False
+    app.should_pause = False
     server = WSGIServer(("", 9000), app)
     server.serve_forever()
