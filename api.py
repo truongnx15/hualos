@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 import json, time
 from flask import Flask, Response, jsonify, render_template, request
 import gevent
 from gevent.wsgi import WSGIServer
 from gevent.queue import Queue
+import urllib
 
 app = Flask(__name__)
 subscriptions = []
@@ -66,11 +67,15 @@ class ServerSentEvent(object):
         
         return "%s\n\n" % "\n".join(lines)
 
+
 @app.route("/publish/epoch/end/", methods=['POST'])
 def publish():
-    payload = request.form.get('data')
+
+    json_string = urllib.parse.unquote(request.get_data().decode("utf-8")).replace("+", "").replace("}'", "}").replace("data=", "")
+    payload = json.loads(json_string)
+
     try:
-        data = json.loads(payload)
+        payload = json.loads(json_string)
     except:
         return {'error':'invalid payload'}
 

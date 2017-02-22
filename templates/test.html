@@ -24,12 +24,8 @@
             <div id="accChart"></div>
         </div>
         <div class="col-md-12 col-lg-6">
-            <h2>Other</h2>
-            <div id="otherChart"></div>
-          </div>
-        <div class="col-md-12 col-lg-6">
-            <h2>F-Score</h2>
-            <div id="fscore"></div>
+            <h2>F-Measure</h2>
+            <div id="fmeasureChart"></div>
         </div>
       </div>
     </div>
@@ -40,53 +36,28 @@
 <script type="text/javascript">
   accChart = new C3Chart("accChart",["acc", "val_acc"]);
   lossChart = new C3Chart("lossChart",["loss", "val_loss"]);
-  otherChart = new C3Chart("otherChart",["batch", "size"]);
-  fscore = new C3Chart("fscore",["fscore0", "fscore1"]);
+  fmeasureChart = new C3Chart("fmeasureChart",["fmeasure", "val_fmeasure"]);
 
   var update = function(newData){
     accChart.update(newData);
     lossChart.update(newData);
-    otherChart.update(newData);
-    fscore.update(newData);
-  };
-  var addTestData = function() {
-    mydata1 = {
-      "acc":0.953,
-      "loss":0.185,
-      "batch":92,
-      "epoch":20,
-      "val_acc":0.94,
-      "val_loss":0.11,
-      "size":127
-    };
-    mydata2 = {
-      "acc":0.97,
-      "loss":0.17,
-      "batch":92,
-      "epoch":21,
-      "val_acc":0.96,
-      "val_loss":0.10,
-      "size":127
-    };
-    update(mydata1);
-    update(mydata2);
+    fmeasureChart.update(newData);
   };
 
   $(document).ready(function(){
     accChart.init();
     lossChart.init();
-    otherChart.init();
-    fscore.init();
+    fmeasureChart.init();
 
     var source = new EventSource('/subscribe/epoch/end/');
 
     //addTestData();
     source.addEventListener('message', function(e) {
       console.log(e.data);
-      var data = JSON.parse(e.data);
+	  str = e.data.replace(/\'/g, '"');
+      var data = JSON.parse(str);
       console.log(data);
       update(data);
-
     }, false);
   });
 
